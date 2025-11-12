@@ -303,32 +303,78 @@ def create_dim_customer(
 
 def create_dim_store(spark) -> DataFrame:
     """
-    Store dimension:
-      - 1–5 = San Francisco physical stores
-      - 6   = Online shop
+    Dimension: Store (Sunny Bay Roastery)
+
+    - Store_keys 1–5  : Physical retail cafés in San Francisco
+    - Store_key  6    : Online e-commerce channel ("Sunny Bay Online")
+
+    Includes metadata for analytics:
+      * open/close dates
+      * location / neighborhood
+      * store size, seating, and employees
+      * flags for online vs physical
+      * derived column: years_active
     """
 
+    # ------------------------------------------------------------------
+    # Static store data
+    # ------------------------------------------------------------------
     stores = [
-        (1, "Sunny Bay – Market Street",     "Retail Cafe", "San Francisco", "Downtown / Financial District", "2010-03-15", None, False),
-        (2, "Sunny Bay – Mission",           "Retail Cafe", "San Francisco", "Mission District",              "2012-05-01", None, False),
-        (3, "Sunny Bay – Westfield Mall",    "Retail Cafe", "San Francisco", "Union Square / Mall",           "2015-09-10", None, False),
-        (4, "Sunny Bay – SoMa Offices",      "Retail Cafe", "San Francisco", "SoMa / Office Hub",             "2017-01-20", None, False),
-        (5, "Sunny Bay – Hayes Valley",      "Retail Cafe", "San Francisco", "Hayes Valley",                  "2018-06-05", None, False),
-        (6, "Sunny Bay Online",              "Online Shop", "San Francisco", "E-commerce / Home Barista",     "2020-04-01", None, True),
+        (1, "Sunny Bay – Market Street",  "Retail Cafe", "San Francisco",
+         "Downtown / Financial District", "2010-03-15", None, False,
+         120.0, 45, 18, "Alice Chen"),
+        (2, "Sunny Bay – Mission",        "Retail Cafe", "San Francisco",
+         "Mission District",              "2012-05-01", None, False,
+         100.0, 38, 15, "Carlos Ramirez"),
+        (3, "Sunny Bay – Westfield Mall", "Retail Cafe", "San Francisco",
+         "Union Square / Mall",           "2015-09-10", None, False,
+         80.0, 25, 10, "Julia Tan"),
+        (4, "Sunny Bay – SoMa Offices",   "Retail Cafe", "San Francisco",
+         "SoMa / Office Hub",             "2017-01-20", None, False,
+         110.0, 40, 14, "Kevin O’Neill"),
+        (5, "Sunny Bay – Hayes Valley",   "Retail Cafe", "San Francisco",
+         "Hayes Valley",                  "2018-06-05", None, False,
+         90.0, 30, 12, "Priya Desai"),
+        (6, "Sunny Bay Online",           "Online Shop", "San Francisco",
+         "E-commerce / Home Barista",     "2020-04-01", None, True,
+         None, None, 25, "Digital Team"),
     ]
 
-    columns = [
+    # ------------------------------------------------------------------
+    # Define schema explicitly
+    # ------------------------------------------------------------------
+    schema = T.StructType([
+        T.StructField("store_key", T.IntegerType(), False),
+        T.StructField("store_name", T.StringType(), False),
+        T.StructField("store_type", T.StringType(), False),
+        T.StructField("city", T.StringType(), False),
+        T.StructField("neighborhood_or_channel", T.StringType(), False),
+        T.StructField("open_date", T.StringType(), True),
+        T.StructField("close_date", T.StringType(), True),
+        T.StructField("is_online", T.BooleanType(), False),
+        T.StructField("store_area_sqm", T.DoubleType(), True),
+        T.StructField("seating_capacity", T.IntegerType(), True),
+        T.StructField("num_employees", T.IntegerType(), True),
+        T.StructField("store_manager", T.StringType(), True),
+    ])
+
+    dim_store = spark.createDataFrame(stores, schema=schema)
+
+    # ------------------------------------------------------------------
+    # Final column order
+    # ------------------------------------------------------------------
+    dim_store = dim_store.select(
         "store_key",
         "store_name",
         "store_type",
         "city",
         "neighborhood_or_channel",
-        "open_date",
-        "close_date",
         "is_online",
-    ]
-
-    dim_store = spark.createDataFrame(stores, schema=columns)
+        "store_area_sqm",
+        "seating_capacity",
+        "num_employees",
+        "store_manager"
+    )
 
     return dim_store
 

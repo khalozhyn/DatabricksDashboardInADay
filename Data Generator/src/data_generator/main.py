@@ -13,6 +13,7 @@ from impact_factors import (
     add_total_impact_features,
     add_random_noise_features,
     add_seasonality_features,
+    remove_helper_columns,
 )
 from dimensions import add_dim_product_key, add_dim_customer_key, create_dim_product, create_dim_customer, create_dim_store, create_dim_date
 
@@ -127,6 +128,10 @@ def build_store_dataframe(
         # base_volume is already in df from feature_generation,
         # and add_total_impact_features will create "simulated_volume"
     )
+
+    # 9️⃣ Cleanup: remove helper and intermediate columns
+    df = remove_helper_columns(df)
+    print("🧹 Removed helper columns and prepared clean final dataset.")
 
     return df
 

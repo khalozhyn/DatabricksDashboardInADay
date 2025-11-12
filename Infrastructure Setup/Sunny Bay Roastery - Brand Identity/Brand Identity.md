@@ -61,10 +61,6 @@ The palette aims to balance *warm familiarity* (latte beige, roasted brown) with
 | KPI cards (negative) | Alert | `#A64B2A` |
 | Background areas | Neutral Warm or Highlight Variant | `#C8B79A` / `#D1E3D1` for gentle contrast |
 
----
-
-### 🪄 Pro Tip
-> When building dashboards in Databricks or Power BI, use these colors consistently to maintain the Sunny Bay Roastery brand feeling — *natural, grounded, and quietly data-driven.*
 
 ---
 

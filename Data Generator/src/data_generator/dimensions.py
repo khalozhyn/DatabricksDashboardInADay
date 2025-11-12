@@ -281,12 +281,6 @@ def create_dim_customer(
          .otherwise("San Francisco")
     )
 
-    # - customer_since_year: spread between 2010 and 2023
-    dim_customer = dim_customer.withColumn(
-        "customer_since_year",
-        (F.lit(2010) + (F.col("local_id") % 14)).cast("int")  # 2010–2023
-    )
-
     # Reorder / select columns
     dim_customer = dim_customer.select(
         "customer_key",
@@ -294,8 +288,7 @@ def create_dim_customer(
         "loyalty_segment",
         "channel_preference",
         "is_home_barista",
-        "city",
-        "customer_since_year",
+        "city"
     )
 
     return dim_customer
@@ -389,20 +382,15 @@ def create_dim_date(
     us_public_holidays: list = None,
 ) -> DataFrame:
     """
-    Date dimension for Sunny Bay Roastery.
+    Simplified Date dimension for Sunny Bay Roastery.
 
     - One row per calendar day between start_date and end_date.
     - Includes:
         date_key, year, month, day, calendar_week,
         day_of_week (1=Mon..7=Sun, ISO-like), day_name, is_weekend,
-        season, is_covid_period, is_covid_first_half,
-        season_weight, day_of_week_weight, covid_weight,
-        is_us_public_holiday, holiday_weight, demand_factor
+        season, is_us_public_holiday
     """
 
-    # ------------------------------------------------------------------
-    # Defaults if not provided
-    # ------------------------------------------------------------------
     if season_weights is None:
         season_weights = {
             "winter": 1.10,
@@ -412,25 +400,24 @@ def create_dim_date(
         }
 
     if dow_weights is None:
-        # 1=Mon..7=Sun (we’ll build it that way below)
         dow_weights = {
-            1: 0.95,  # Mon
-            2: 1.00,  # Tue
-            3: 1.00,  # Wed
-            4: 1.05,  # Thu
-            5: 1.20,  # Fri
-            6: 1.40,  # Sat
-            7: 1.10,  # Sun
+            1: 0.95,
+            2: 1.00,
+            3: 1.00,
+            4: 1.05,
+            5: 1.20,
+            6: 1.40,
+            7: 1.10,
         }
 
     if us_public_holidays is None:
-        us_public_holidays = []  # ["2010-01-01", "2010-07-04", ...]
+        us_public_holidays = []
 
     # ------------------------------------------------------------------
     # 1) Base date list
     # ------------------------------------------------------------------
     dates = (
-        spark.range(1)  # dummy
+        spark.range(1)
         .select(
             F.explode(
                 F.sequence(
@@ -452,9 +439,7 @@ def create_dim_date(
     )
 
     # ------------------------------------------------------------------
-    # 1a) Day-of-week (no datetime patterns)
-    # Spark dayofweek(): 1=Sunday .. 7=Saturday
-    # We convert to ISO-like: 1=Mon .. 7=Sun
+    # Day-of-week
     # ------------------------------------------------------------------
     dim_date = dim_date.withColumn("spark_dow", F.dayofweek("date"))
     dim_date = dim_date.withColumn(
@@ -462,7 +447,6 @@ def create_dim_date(
         ((F.col("spark_dow") + 5) % 7) + 1  # 1=Mon..7=Sun
     )
 
-    # Day name derived from our own day_of_week (no format strings)
     dim_date = dim_date.withColumn(
         "day_name",
         F.when(F.col("day_of_week") == 1, "Mon")
@@ -477,7 +461,7 @@ def create_dim_date(
     dim_date = dim_date.withColumn("is_weekend", F.col("day_of_week").isin(6, 7))
 
     # ------------------------------------------------------------------
-    # 2) Season
+    # Season
     # ------------------------------------------------------------------
     dim_date = dim_date.withColumn(
         "season",
@@ -488,52 +472,7 @@ def create_dim_date(
     )
 
     # ------------------------------------------------------------------
-    # 3) COVID flags
-    # ------------------------------------------------------------------
-    covid_start_col = F.to_date(F.lit(covid_start))
-    covid_end_col   = F.to_date(F.lit(covid_end))
-    covid_mid_col   = F.date_add(
-        covid_start_col,
-        (F.datediff(covid_end_col, covid_start_col) / 2).cast("int")
-    )
-
-    dim_date = (
-        dim_date
-        .withColumn(
-            "is_covid_period",
-            (F.col("date") >= covid_start_col) & (F.col("date") <= covid_end_col)
-        )
-        .withColumn(
-            "is_covid_first_half",
-            (F.col("date") >= covid_start_col) & (F.col("date") <= covid_mid_col)
-        )
-    )
-
-    # ------------------------------------------------------------------
-    # 4) season_weight
-    # ------------------------------------------------------------------
-    season_weight_map = F.create_map(
-        *[F.lit(x) for kv in season_weights.items() for x in kv]
-    )
-    dim_date = dim_date.withColumn(
-        "season_weight",
-        season_weight_map[F.col("season")].cast("double")
-    )
-
-    # ------------------------------------------------------------------
-    # 5) day_of_week_weight
-    # ------------------------------------------------------------------
-    dow_weight_map = F.create_map(
-        *[F.lit(x) for kv in dow_weights.items() for x in kv]
-    )
-    dim_date = dim_date.withColumn(
-        "day_of_week_weight",
-        dow_weight_map[F.col("day_of_week")].cast("double")
-    )
-
-    # ------------------------------------------------------------------
-    # 6) US public holidays + holiday_weight
-    #    Handle empty list safely (no F.array() on empty)
+    # US public holidays
     # ------------------------------------------------------------------
     if len(us_public_holidays) > 0:
         holiday_array = F.array([F.to_date(F.lit(d)) for d in us_public_holidays])
@@ -543,27 +482,6 @@ def create_dim_date(
         )
     else:
         dim_date = dim_date.withColumn("is_us_public_holiday", F.lit(False))
-
-    dim_date = dim_date.withColumn(
-        "holiday_weight",
-        F.when(F.col("is_us_public_holiday"), F.lit(1.5)).otherwise(F.lit(1.0))
-    )
-
-    # ------------------------------------------------------------------
-    # 7) covid_weight & final demand_factor
-    # ------------------------------------------------------------------
-    dim_date = dim_date.withColumn(
-        "covid_weight",
-        F.when(F.col("is_covid_period"), F.lit(0.6)).otherwise(F.lit(1.0))
-    )
-
-    dim_date = dim_date.withColumn(
-        "demand_factor",
-        F.col("season_weight")
-        * F.col("day_of_week_weight")
-        * F.col("covid_weight")
-        * F.col("holiday_weight")
-    )
 
     # ------------------------------------------------------------------
     # Final column order (drop helper spark_dow)
@@ -579,14 +497,7 @@ def create_dim_date(
         "day_name",
         "is_weekend",
         "season",
-        "is_covid_period",
-        "is_covid_first_half",
-        "is_us_public_holiday",
-        "season_weight",
-        "day_of_week_weight",
-        "holiday_weight",
-        "covid_weight",
-        "demand_factor",
+        "is_us_public_holiday"
     )
 
     return dim_date

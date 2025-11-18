@@ -57,9 +57,14 @@ SELECT * FROM silver.product;
 
 CREATE MATERIALIZED VIEW gold.fact_coffee_sales AS
 SELECT
-    fcs.*
-    -- dp.list_price_usd * fcs.quantity_sold                               AS gross_revenue_usd,
-    -- (dp.list_price_usd * fcs.quantity_sold) / (1 + ds.tax_rate)         AS net_revenue_usd
+    fcs.date_key
+    ,fcs.store_key
+    ,fcs.product_key
+    ,fcs.customer_key
+    ,fcs.quantity_sold
+    ,dp.list_price_usd * fcs.quantity_sold AS gross_revenue_usd
+    ,(dp.list_price_usd * fcs.quantity_sold) * ds.tax_rate AS vat_usd
+    ,dp.cost_of_goods_usd * fcs.quantity_sold AS cost_of_goods_usd
 FROM silver.coffee_sales fcs
 JOIN silver.product dp
   ON fcs.product_key = dp.product_key

@@ -290,61 +290,111 @@ def create_dim_customer(
     return dim_customer
 
 
+from pyspark.sql import DataFrame
+from pyspark.sql import types as T
+
 def create_dim_store(spark) -> DataFrame:
     """
     Dimension: Store (Sunny Bay Roastery)
-    Added: tax_rate (per store)
+    - Each store has a non-null tax_rate
+    - Geo columns added for AI/BI maps:
+      * country_name, country_iso2, country_iso3
+      * state_province, state_iso2
+      * county_district
+      * postal_code
+      * latitude, longitude
     """
 
     # ------------------------------------------------------------------
-    # Static store data + tax_rate
+    # Static store data + tax_rate + geo columns
     # ------------------------------------------------------------------
     stores = [
-        # store_key, name, type, city, neighborhood, open, close, is_online,
-        # area, seating, employees, manager, tax_rate
+        # store_key, store_name,           store_type,   city,
+        # neighborhood_or_channel,         open_date,    close_date,
+        # is_online, store_area_sqm, seating_capacity, num_employees, store_manager,
+        # tax_rate,
+        # country_name, country_iso2, country_iso3,
+        # state_province, state_iso2, county_district,     postal_code,
+        # latitude,   longitude
+
         (1, "Sunny Bay – Market Street",  "Retail Cafe", "San Francisco",
-         "Downtown / Financial District", "2010-03-15", None, False,
-         120.0, 45, 18, "Alice Chen", 0.08625),
+         "Downtown / Financial District", "2010-03-15", None,
+         False, 120.0, 45, 18, "Alice Chen",
+         0.08625,
+         "United States", "US", "USA",
+         "California", "CA", "San Francisco County", "94103",
+         37.7890, -122.4010),
 
         (2, "Sunny Bay – Mission",        "Retail Cafe", "San Francisco",
-         "Mission District",              "2012-05-01", None, False,
-         100.0, 38, 15, "Carlos Ramirez", 0.08625),
+         "Mission District",              "2012-05-01", None,
+         False, 100.0, 38, 15, "Carlos Ramirez",
+         0.08625,
+         "United States", "US", "USA",
+         "California", "CA", "San Francisco County", "94110",
+         37.7599, -122.4148),
 
         (3, "Sunny Bay – Westfield Mall", "Retail Cafe", "San Francisco",
-         "Union Square / Mall",           "2015-09-10", None, False,
-         80.0, 25, 10, "Julia Tan", 0.08625),
+         "Union Square / Mall",           "2015-09-10", None,
+         False, 80.0, 25, 10, "Julia Tan",
+         0.08625,
+         "United States", "US", "USA",
+         "California", "CA", "San Francisco County", "94102",
+         37.7840, -122.4064),
 
         (4, "Sunny Bay – SoMa Offices",   "Retail Cafe", "San Francisco",
-         "SoMa / Office Hub",             "2017-01-20", None, False,
-         110.0, 40, 14, "Kevin O’Neill", 0.08625),
+         "SoMa / Office Hub",             "2017-01-20", None,
+         False, 110.0, 40, 14, "Kevin O’Neill",
+         0.08625,
+         "United States", "US", "USA",
+         "California", "CA", "San Francisco County", "94105",
+         37.7896, -122.3950),
 
         (5, "Sunny Bay – Hayes Valley",   "Retail Cafe", "San Francisco",
-         "Hayes Valley",                  "2018-06-05", None, False,
-         90.0, 30, 12, "Priya Desai", 0.08625),
+         "Hayes Valley",                  "2018-06-05", None,
+         False, 90.0, 30, 12, "Priya Desai",
+         0.08625,
+         "United States", "US", "USA",
+         "California", "CA", "San Francisco County", "94102",
+         37.7763, -122.4240),
 
-        # Online shop uses destination-based tax — store has no fixed rate
+        # Online shop: destination-based tax, but we still use a numeric 0.0
+        # so tax_rate is never NULL
         (6, "Sunny Bay Online",           "Online Shop", "San Francisco",
-         "E-commerce / Home Barista",     "2020-04-01", None, True,
-         None, None, 25, "Digital Team", 0.0),
+         "E-commerce / Home Barista",     "2020-04-01", None,
+         True, None, None, 25, "Digital Team",
+         0.0,
+         "United States", "US", "USA",
+         "California", "CA", "San Francisco County", "94107",
+         37.7739, -122.3917),
     ]
 
     # ------------------------------------------------------------------
-    # Schema including tax_rate
+    # Schema including tax_rate + geo columns
     # ------------------------------------------------------------------
     schema = T.StructType([
-        T.StructField("store_key", T.IntegerType(), False),
-        T.StructField("store_name", T.StringType(), False),
-        T.StructField("store_type", T.StringType(), False),
-        T.StructField("city", T.StringType(), False),
-        T.StructField("neighborhood_or_channel", T.StringType(), False),
-        T.StructField("open_date", T.StringType(), True),
-        T.StructField("close_date", T.StringType(), True),
-        T.StructField("is_online", T.BooleanType(), False),
-        T.StructField("store_area_sqm", T.DoubleType(), True),
-        T.StructField("seating_capacity", T.IntegerType(), True),
-        T.StructField("num_employees", T.IntegerType(), True),
-        T.StructField("store_manager", T.StringType(), True),
-        T.StructField("tax_rate", T.DoubleType(), True),
+        T.StructField("store_key",              T.IntegerType(),  False),
+        T.StructField("store_name",             T.StringType(),   False),
+        T.StructField("store_type",             T.StringType(),   False),
+        T.StructField("city",                   T.StringType(),   False),
+        T.StructField("neighborhood_or_channel",T.StringType(),   False),
+        T.StructField("open_date",              T.StringType(),   True),
+        T.StructField("close_date",             T.StringType(),   True),
+        T.StructField("is_online",              T.BooleanType(),  False),
+        T.StructField("store_area_sqm",         T.DoubleType(),   True),
+        T.StructField("seating_capacity",       T.IntegerType(),  True),
+        T.StructField("num_employees",          T.IntegerType(),  True),
+        T.StructField("store_manager",          T.StringType(),   True),
+        T.StructField("tax_rate",               T.DoubleType(),   False),
+
+        T.StructField("country_name",           T.StringType(),   False),
+        T.StructField("country_iso2",           T.StringType(),   False),
+        T.StructField("country_iso3",           T.StringType(),   False),
+        T.StructField("state_province",         T.StringType(),   False),
+        T.StructField("state_iso2",             T.StringType(),   False),
+        T.StructField("county_district",        T.StringType(),   False),
+        T.StructField("postal_code",            T.StringType(),   False),
+        T.StructField("latitude",               T.DoubleType(),   True),
+        T.StructField("longitude",              T.DoubleType(),   True),
     ])
 
     dim_store = spark.createDataFrame(stores, schema=schema)
@@ -363,7 +413,16 @@ def create_dim_store(spark) -> DataFrame:
         "seating_capacity",
         "num_employees",
         "store_manager",
-        "tax_rate"
+        "tax_rate",
+        "country_name",
+        "country_iso2",
+        "country_iso3",
+        "state_province",
+        "state_iso2",
+        "county_district",
+        "postal_code",
+        "latitude",
+        "longitude",
     )
 
     return dim_store

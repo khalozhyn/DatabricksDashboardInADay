@@ -2,10 +2,8 @@
 
 resources:
   pipelines:
-    dab_data_engineering_etl:
-      name: dab_data_engineering_etl
+    sunny_bay_roastery:
       catalog: ${var.catalog}
-      schema: ${var.schema}
       serverless: true
       root_path: "."
 

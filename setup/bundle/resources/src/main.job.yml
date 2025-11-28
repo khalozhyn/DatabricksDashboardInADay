@@ -12,7 +12,9 @@ resources:
         - task_key: generate_bronze_data
           python_task:
             python_file: ./src/bronze/main.py
+            parameters:
+            - catalog: ${var.catalog}
 
-        - task_key: refresh_pipeline
+        - task_key: run_pipeline
           pipeline_task:
-            pipeline_id: ${resources.pipelines.sunny_roastery_etl.id}
+            pipeline_id: ${resources.pipelines.sunny_bay_roastery.id}

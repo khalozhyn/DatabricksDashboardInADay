@@ -1,30 +1,24 @@
-# 🧪 Lab 2 – Creating an AI/BI Dashboard
+# 🧪 Lab 3 – Creating an AI/BI Dashboard
 
 ## 🎯 Learning Objectives
 
 By the end of this lab, you will be able to:
 
-- Use a Databricks Metric View as the primary semantic source for dashboard visuals.
-- Build interactive AI/BI Dashboards including charts, filters, drill-downs, and summary tiles.
-- Add and configure global filters (e.g., date, store, product) to make dashboards fully interactive.
-- Use AI-assisted visual creation to accelerate dashboard building with natural-language prompts.
+- Use a Databricks metric view as the primary semantic source for dashboard visuals.
+- Build interactive AI/BI dashboards with charts, filters, drill-downs, and summary tiles.
+- Configure page-level and global filters (date, store, product) to enable rich interactivity.
+- Leverage AI-assisted visual creation with natural-language prompts to accelerate dashboard building.
 
 ## Introduction
 
 **What Are AI/BI Dashboards?**
 
-Databricks Genie is an AI-powered, natural-language interface that lets business users ask questions about their data in plain English and get back answers as tables, charts, and summaries without writing SQL or building reports first. It sits on top of governed datasets like Unity Catalog metric views, so all insights respect existing security, governance, and business definitions.
-
-With Genie, teams can:
-- Go beyond static dashboards and get on‑the‑fly answers to new questions that weren’t pre-modeled in reports.
-- Self‑serve insights using conversational prompts, reducing dependency on data engineers and analysts for every new question.
-- Rely on consistent metrics and semantics defined in Unity Catalog and the Genie knowledge store, improving accuracy and trust in results. 
+AI/BI Dashboards in Databricks are interactive, web-based reports that combine tables, charts, filters, and text into a single, shareable view. They run directly on governed datasets such as Unity Catalog metric views, and support AI-assisted visual creation, cross-filtering, drill-through, and global filters.
 
 ## Instructions
 
 Before you start, please verify:
-- The **Sunny Bay Coffee Sales metric view** from Lab 2 is created and published in Unity Catalog.
-
+- The **Sunny Bay Coffee Sales Metric View** from Lab 2 is created and published in Unity Catalog.
 
 **Step 1: Open the AI/BI Dashboard Template**
 AI/BI Dashboards can be stored as a templates which contain the corporate identity, logos, and more elements that should be standardized.
@@ -39,7 +33,7 @@ AI/BI Dashboards can be stored as a templates which contain the corporate identi
 
 
 **Step 2: Configure the Metric View as a Data Source**
-Every AI/BI Dashboard must have one or more data sources, which are used to create visualization.
+Every AI/BI Dashboard must have one or more data sources, which are used to create the visualizations.
 
 1. Click on the "Data" tab to select the source data for the Dashboard
 2. Click on "Add data source", and select the Metric View from Lab 2 as the data source
@@ -49,7 +43,7 @@ Every AI/BI Dashboard must have one or more data sources, which are used to crea
 
 
 **Step 3: Create Your First AI-Assisted Visual**
-The Databricks Assistant xxx 
+The Databricks Assistant can generate visuals directly from natural language prompts.
 
 1. Switch back to the "Sales Report" tab
 2. Click on the "Add a visualization" icon
@@ -70,12 +64,13 @@ The Databricks Assistant xxx
 <div style="text-align:left;">
   <img src="./Artifacts/Dashboard_GroupByStore.png" width="15%">
 </div>
-7. Add the measures "total_costs_of_goods" and "total net revenue" as tooltip
+7. Add the measures "total_cost_of_goods" and "total_net_revenue_usd" as tooltip
 8. Rename the tooltip values to "Total Costs of Goods [$]" and "Total Net Revenue [$]"
 9. Rename the title to "Net Profit per Month [$]"
 
 
 **Step 4: Add a Page Level Filter for the Store Name**
+In this step, you will add page-level filters for store and product to enable interactive exploration for business users.
 
 1. Click on the "Add a filter" icon
 <div style="text-align:left;">
@@ -87,7 +82,7 @@ The Databricks Assistant xxx
 5. Duplicate the filter widget twice, by selecting it, pressing "CTRL + C", and "CTRL + V"
 6. Rename the first duplicate to "Product Category", remove the existing value from fields, and select "product_category"
 7. Rename the second duplicate to "Product Subcategory", remove the existing value from fields, and select "product_subcategory"
-8. Filter the product category for "Food", and see how the values in the filter product subcategory are effected
+8. Filter the product category for "Food", and see how the values in the filter product subcategory are affected
 
 **Step 5: Add a Global Filter**
 
@@ -99,9 +94,9 @@ Global filters are helpful to apply a filter for multiple report pages. We are g
 </div>
 2. Click on the "+" icon to add a new global filter widget
 3. Select the "Date Range Picker" as the filter type
-4. Choose data as a field
+4. Choose date as a field
 5. Rename the widget from "date" to "Date"
-6. Change the filter from "Jan 01, 2015" to "Dec 31, 2025"
+6. Change the filter from "Jan 01, 2015" to "Dec 31, 2025", which will become the default for the global filter
 <div style="text-align:left;">
   <img src="./Artifacts/Dashboard_GlobalFilters2.png" width="10%">
 </div>
@@ -115,7 +110,7 @@ Global filters are helpful to apply a filter for multiple report pages. We are g
 3. Select the "Pie" as visualization type
 4. Choose the "total_net_profit" as the angle, and "store_online" as the color
 5. Change the colors for the values "true", and "false" 
-6. Rename the aanglexis title to "Net Profit [$]"
+6. Rename the angle title to "Net Profit [$]"
 7. Activate labels for this visualization
 8. Click on the one of the values of the pie chart, and see how the cross-filtering functionality effects the bar chart
 <div style="text-align:left;">
@@ -134,7 +129,6 @@ Global filters are helpful to apply a filter for multiple report pages. We are g
 <div style="text-align:left;">
   <img src="./Artifacts/Dashboard_MapFullScreen.png" width="30%">
 </div>
-8. 
 
 **Step 8: Explore the Drill-Through Feature**
 
@@ -146,15 +140,15 @@ Global filters are helpful to apply a filter for multiple report pages. We are g
 6. Choose "day_of_week" for the x-axis, and "product_name" for the y-axis
 7. Select "total_net_profit" as the color
 8. Activate labels for this visualization
-9. Rename the x-axis titles to "Net Profit [$]"
+9. Rename the value to "Net Profit [$]"
 10. Change the x-axis scale type to "categorical"
-10. Jump back to "Sales Report" page
-11. Drill into the market report by rightclicking on the value for one store, clicking "drill to", and "Market Report" 
+11. Jump back to "Sales Report" page
+12. Drill into the market report by rightclicking on the value for one store, clicking "drill to", and "Market Report" 
 <div style="text-align:left;">
   <img src="./Artifacts/Dashboard_DrillThrough.png" width="30%">
 </div>
-12. The filter is propagated to the "Market Report", and the revenue for each product grouped by day of the week is displayed
-13. Reset the filter by clicking "Reset all to default"
+13. The filter is propagated to the "Market Report", and the revenue for each product grouped by day of the week is displayed
+14. Reset the filter by clicking "Reset all to default"
 
 
 **Step 9: Publish the Report**
@@ -174,4 +168,12 @@ Global filters are helpful to apply a filter for multiple report pages. We are g
 </div>
 2. Search for the report, or click on "Dashboards" to find all available dashboards
 
+## What Happens Next?
+
+You have now created a production-ready AI/BI Dashboard for Sunny Bay Roastery, powered by the `sm_fact_coffee_sales_genie` metric view.  
+Business users can:
+
+- Filter by store and product to answer ad-hoc questions.
+- Use cross-filtering and drill-through for deeper analysis.
+- Access the report in Databricks One UI as dashboard consumers.
 

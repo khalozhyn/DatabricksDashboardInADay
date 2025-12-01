@@ -50,3 +50,4 @@ Before you start, please verify:
     - Specify standard aggregations and filters (e.g., “Prefer last 30 days when no date is specified”).
     ![](./Artifacts/Genie_Instructions.png)
 
+sample questions

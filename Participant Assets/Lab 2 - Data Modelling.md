@@ -32,7 +32,9 @@ They allow consistent reporting, simplify complex SQL logic, and centralize metr
 
 ### Create am empty Metric View
 
-1. Navigate to the gold schema using the Catalog Explorer and create a new Metric View by selecting it after clicking the New Button. Name it ``sm_fact_coffee_sales``. ![alt text](./Artifacts/MetricView_CreateMetricView.png)
+1. Navigate to the gold schema using the Catalog Explorer and create a new Metric View by selecting it after clicking the New Button. Name it ``sm_fact_coffee_sales``. 
+
+![alt text](./Artifacts/MetricView_CreateMetricView.png)
 
 2. Delete the provided sample code. You will create your own Metric View from scratch.
 
@@ -57,8 +59,9 @@ source: sunny_bay_roastery.gold.fact_coffee_sales
 
 4. Add a final join to the store dimension table named `sunny_bay_roastery.gold.dim_store`. The join columns are named `store_key` on both sides. For the name attribute, set "store".
 
-4. Provide the name **`sm_fact_coffee_sales`** and save the Metric View by clicking the Save button at the right top corner. If everything is defined correctly, the Metric View will be saved and is immediately available in Unity Catalog. ![alt text](./Artifacts/MetricView_Save.png)
+5. Provide the name **`sm_fact_coffee_sales`** and save the Metric View by clicking the Save button at the right top corner. If everything is defined correctly, the Metric View will be saved and is immediately available in Unity Catalog. 
 
+![alt text](./Artifacts/MetricView_Save.png)
 
 
 ### Define Dimensional Attributes
@@ -75,9 +78,8 @@ dimensions:
     - Product category (product.product_category)
     - Product subcategory (product.product_subcategory)
  
-3. Since you also joined the **date** dimension table in the previous section, add the following attributes from the date dimension:
-    - Month (date.month)
-    - Year (date.year)
+3. Since you also joined the **date** dimension table in the previous section, add the following attribute from the date dimension:
+    - Date (date.date)
 
 4. Finally, add the following attribute from the **store** dimension table>
     - Store Name (store.store_name)
@@ -124,6 +126,9 @@ joins:
     source: sunny_bay_roastery.gold.dim_store
     "on": source.store_key = store.store_key
 
+comment: "Metric view for analyzing Sunny Bay Coffee sales online and office, including\
+  \ Customer and Product analytics."
+
 dimensions:
   - name: product_name
     expr: product.product_name
@@ -134,12 +139,9 @@ dimensions:
   - name: product_subcategory
     expr: product.product_subcategory
     display_name: Product Subcategory
-  - name: date_month
-    expr: date.month
-    display_name: Month
-  - name: date_year
-    expr: date.year
-    display_name: Year
+  - name: date
+    expr: date.date
+    display_name: Date
   - name: store_name
     expr: store.store_name
     display_name: Store Name
@@ -166,10 +168,45 @@ measures:
 
 You created a simple Metric View and users will be able to directly query business metrics without writing SQL joins or recalculating KPIs.
 
-On purpose, you did not yet using any advanced features such as complex calulations, synomyns, formatting, etc. We encourage you to look into more advanced calculations and modelling capabilites such as
-- Different aggregation functions
-- Windowing calcuations such as rolling averages and cumulative calculations.
+On purpose, you did not yet use any advanced features such as complex calulations, synomyns, formatting, etc. We encourage you to look into more advanced calculations and modelling capabilites such as:
 
-To check your results with a sample query
+**Different aggregation functions:**
+```YAML 
+  - name: max_net_revenue_usd
+    expr: MAX(net_revenue_usd)
+  - name: avg_cost_of_goods
+    expr: AVG(cost_of_goods_usd)
+```
+    
+**Windowing calcuations such as rolling averages, previous period and running totals:**
+```YAML 
+  - name: total_gross_revenue_usd_previous_day
+    expr: measure(`total_gross_revenue_usd`)
+    window:
+      - order: date_date
+        semiadditive: last
+        range: trailing 1 day
+```
+**Number formatting and synomyns:**
+```YAML
+  - name: total_gross_revenue_usd
+    expr: SUM(`gross_revenue_usd`)
+    comment: Total gross revenue in USD before VAT and costs
+    display_name: Total Gross Revenue (USD)
+    format:
+      type: currency
+      currency_code: USD
+      decimal_places:
+        type: exact
+        places: 2
+      abbreviation: compact
+    synonyms:
+      - revenue
+      - gross revenue
+```
 
-2. Review [provided YAML](./Artifacts/metric_view.yaml) template for reference. This structure includes source, joins, detailed dimensions, measures with formulas, business-friendly display names, and formatting.
+Review [provided YAML](./Artifacts/metric_view.yaml) template for reference. This structure includes source, joins, detailed dimensions, measures with formulas, business-friendly display names, and formatting. 
+
+**Important:** You will need this Metric View in a subsequent section. Please create it with the name `sm_fact_coffee_sales_genie`.
+
+Once both Metric Views are available in Unity Catalog, proceed to the next section. 

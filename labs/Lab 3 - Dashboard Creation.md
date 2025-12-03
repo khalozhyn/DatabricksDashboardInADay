@@ -29,19 +29,19 @@ AI/BI Dashboards can be stored as a templates which contain the corporate identi
 4. Click on "Edit Draft" to switch to the **Dashboard Creator** perspective
 
 <div style="text-align:left;">
-  <img src="./artifacts/Dashboard_EditDraft.png" width="40%">
+  <img src="./artifacts/Dashboard_EditDraft.png" width="50%">
 </div>
 
 
 **Step 2: Configure the Metric View as a Data Source**
+
 Every AI/BI Dashboard must have one or more data sources, which are used to create the visualizations.
 
 1. Click on the "Data" tab to select the source data for the Dashboard
-
 2. Click on "Add data source", and select the Metric View from Lab 2 as the data source
 
 <div style="text-align:left;">
-  <img src="./artifacts/Dashboard_AddDataSource.png" width="20%">
+  <img src="./artifacts/Dashboard_AddDataSource.png" width="30%">
 </div>
 
 
@@ -53,43 +53,41 @@ The Databricks Assistant can generate visuals directly from natural language pro
 2. Click on the "Add a visualization" icon
 
 <div style="text-align:left;">
-  <img src="./artifacts/Dashboard_AddVisualization.png" width="50%">
+  <img src="./artifacts/Dashboard_AddVisualization.png" width="60%">
 </div>
 
 3. Ask the AI Assisstant in the visualization to "_Create a bar chart that shows the net profit over date aggregated by month_"
-
 4. Press "Accept" when you are satisfied with the visualization. If not, press "Reject", and refine the prompt.
 
 <div style="text-align:left;">
-  <img src="./artifacts/Dashboard_Accept.png" width="30%">
+  <img src="./artifacts/Dashboard_Accept.png" width="40%">
 </div>
 
-4. Change the format of the Net Profit to the type "$" with no decimal places.
+5. Change the format of the Net Profit to the type "$" with no decimal places.
 
  <div style="text-align:left;">
-  <img src="./artifacts/Dashboard_YAxisFormat.png" width="20%">
+  <img src="./artifacts/Dashboard_YAxisFormat.png" width="30%">
 </div>
 
-5. Rename the axis title to "Net Profit [$]"
-
-6. To group the sales by store, click on the "+" next to the "Color" field in the widget settings, and choose the value "store_name"
+6. Rename the axis title to "Net Profit [$]"
+7. To group the sales by store, click on the "+" next to the "Color" field in the widget settings, and choose the value "store_name"
 
 <div style="text-align:left;">
-  <img src="./artifacts/Dashboard_GroupByStore.png" width="20%">
+  <img src="./artifacts/Dashboard_GroupByStore.png" width="30%">
 </div>
 
-7. Add the measures "total_cost_of_goods" and "total_net_revenue_usd" as tooltip
-8. Rename the tooltip values to "Total Costs of Goods [$]" and "Total Net Revenue [$]"
-9. Rename the title to "Net Profit per Month [$]"
-
+8. Add the measures "total_cost_of_goods" and "total_net_revenue_usd" as tooltip
+9. Rename the tooltip values to "Total Costs of Goods [$]" and "Total Net Revenue [$]"
+10. Rename the title to "Net Profit per Month [$]"
 
 **Step 4: Add a Page Level Filter for the Store Name**
 
 In this step, you will add page-level filters for store and product to enable interactive exploration for business users.
 
 1. Click on the "Add a filter" icon
+
 <div style="text-align:left;">
-  <img src="./artifacts/Dashboard_PageFilter.png" width="15%">
+  <img src="./artifacts/Dashboard_PageFilter.png" width="25%">
 </div>
 
 2. Select "Multiple values" as the filter type in the widget settings
@@ -105,9 +103,11 @@ In this step, you will add page-level filters for store and product to enable in
 Global filters are helpful to apply a filter for multiple report pages. We are going to filter out all the sales before 2015.
 
 1. Click on the "Show Global Filters" icon
+
 <div style="text-align:left;">
   <img src="./artifacts/Dashboard_GlobalFilters.png" width="50%">
 </div>
+
 2. Click on the "+" icon to add a new global filter widget
 3. Select the "Date Range Picker" as the filter type
 4. Choose date as a field
@@ -115,7 +115,7 @@ Global filters are helpful to apply a filter for multiple report pages. We are g
 6. Change the filter from "Jan 01, 2015" to "Dec 31, 2025", which will become the default for the global filter
 
 <div style="text-align:left;">
-  <img src="./artifacts/Dashboard_GlobalFilters2.png" width="10%">
+  <img src="./artifacts/Dashboard_GlobalFilters2.png" width="20%">
 </div>
 
 7. Minimize the global filters by clicking on "Hide Global Filters"
@@ -130,6 +130,7 @@ Global filters are helpful to apply a filter for multiple report pages. We are g
 6. Rename the angle title to "Net Profit [$]"
 7. Activate labels for this visualization
 8. Click on the one of the values of the pie chart, and see how the cross-filtering functionality effects the bar chart
+
 <div style="text-align:left;">
   <img src="./artifacts/Dashboard_CrossFiltering.png" width="40%">
 </div>
@@ -143,6 +144,7 @@ Global filters are helpful to apply a filter for multiple report pages. We are g
 5. Use the dimension "product_category" as the color
 6. Rename the color to "Product Category"
 7. Click on the kebab menue of the map visual and click on "View fullscreen"
+
 <div style="text-align:left;">
   <img src="./artifacts/Dashboard_MapFullScreen.png" width="30%">
 </div>

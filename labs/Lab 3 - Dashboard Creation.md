@@ -21,6 +21,7 @@ Before you start, please verify:
 - The **Sunny Bay Coffee Sales Metric View** from Lab 2 is created and published in Unity Catalog.
 
 **Step 1: Open the AI/BI Dashboard Template**
+
 AI/BI Dashboards can be stored as a templates which contain the corporate identity, logos, and more elements that should be standardized.
 
 1. In the Databricks workspace, open **Dashboards** from the left navigation.
